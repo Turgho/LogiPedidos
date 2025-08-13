@@ -11,7 +11,15 @@ public class MongoDbContext
     {
         var client = new MongoClient(settings.ConnectionString);
         Database = client.GetDatabase(settings.DatabaseName);
+        
+        // Cria índice único em CpfCnpj uma vez ao iniciar o contexto
+        var indexOptions = new CreateIndexOptions { Unique = true };
+        var indexKeys = Builders<Cliente>.IndexKeys.Ascending(c => c.CpfCnpj);
+        var indexModel = new CreateIndexModel<Cliente>(indexKeys, indexOptions);
+        
+        Clientes.Indexes.CreateOne(indexModel);
     }
+    
     
     // Collections
     private const string ClientesCollection = "Clientes";
