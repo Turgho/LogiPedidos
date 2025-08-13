@@ -1,4 +1,8 @@
 using LogiPedidosBackend.LogiPedidos.Api.Filters;
+using LogiPedidosBackend.LogiPedidos.Api.Mappers.Cliente;
+using LogiPedidosBackend.LogiPedidos.Domain.Interfaces.Repository;
+using LogiPedidosBackend.LogiPedidos.Domain.Interfaces.Services;
+using LogiPedidosBackend.LogiPedidos.Domain.Services;
 using LogiPedidosBackend.LogiPedidos.Infrastructure.Data;
 using LogiPedidosBackend.LogiPedidos.Infrastructure.Repositories;
 using Microsoft.OpenApi.Models;
@@ -34,11 +38,16 @@ try
     // Substitui config padrão pela carregada manualmente
     builder.Configuration.Sources.Clear();
     builder.Configuration.AddConfiguration(config);
+    
+    // Configuração dos AutoMappers
+    builder.Services.AddAutoMapper(typeof(ClienteMapper).Assembly);
 
     // Registra infraestrutura e serviços
     builder.Services.AddInfrastructure(builder.Configuration);
-    
-    builder.Services.AddScoped<ClienteRepository, ClienteRepository>();
+
+    // Configuração de Serviços e Repositories
+    builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
+    builder.Services.AddScoped<IClienteServices, ClienteServices>();
 
     builder.Services.AddControllers(options =>
     {
@@ -52,6 +61,7 @@ try
     builder.Services.AddSwaggerGen(c =>
     {
         c.SwaggerDoc("v1", new OpenApiInfo { Title = "LogiPedidosAPI", Version = "v1" });
+        c.EnableAnnotations();
     });
 
     // Monta pipeline da aplicação
